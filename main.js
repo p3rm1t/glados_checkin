@@ -17,7 +17,8 @@ const glados = async () => {
         headers: { ...common, 'content-type': 'application/json' },
         body: JSON.stringify({ token: domain }),
       }).then((r) => r.json())
-      if (action?.code) throw new Error(`${action?.message} (code=${action?.code}${action?.reason ? ', reason=' + action.reason : ''})`)
+      const alreadyCheckedIn = action?.code === 1 && /Today's observation logged\. Return tomorrow for more points\./i.test(String(action?.message || ''))
+      if (action?.code && !alreadyCheckedIn) throw new Error(`${action?.message} (code=${action?.code}${action?.reason ? ', reason=' + action.reason : ''})`)
       const status = await fetch(`https://${domain}/api/user/status`, {
         method: 'GET',
         headers: { ...common },
@@ -25,7 +26,7 @@ const glados = async () => {
       if (status?.code) throw new Error(status?.message)
       notice.push(
         'Checkin OK',
-        `${action?.message}`,
+        alreadyCheckedIn ? 'Already checked in today' : `${action?.message}`,
         `Left Days ${Number(status?.data?.leftDays)}`
       )
     } catch (error) {
