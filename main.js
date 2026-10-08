@@ -113,7 +113,19 @@ const notify = async (notice) => {
 }
 
 const main = async () => {
-  await notify(await glados())
+  if (!process.env.GLADOS) throw new Error('Missing GLADOS secret')
+  const notice = await glados()
+
+  // Always show the result in Actions logs, even without console notifications.
+  if (!String(process.env.NOTIFY || '').split('\n').some((option) => option.startsWith('console:'))) {
+    for (const line of notice) console.log(line)
+  }
+
+  await notify(notice)
+  if (notice.includes('Checkin Error')) process.exitCode = 1
 }
 
-main()
+main().catch((error) => {
+  console.error(error)
+  process.exitCode = 1
+})
