@@ -21,3 +21,5 @@ jobs:
           GLADOS_UA: ${{ secrets.GLADOS_UA }}
           DOMAIN: ${{ secrets.DOMAIN }}
           NOTIFY: ${{ secrets.NOTIFY }}
+          AUTO_EXCHANGE: ${{ vars.AUTO_EXCHANGE || 'true' }}
+          EXCHANGE_THRESHOLD: ${{ vars.EXCHANGE_THRESHOLD || '500' }}
